@@ -32,7 +32,7 @@ def getLyricsFromInFile(lyric_corpus):
         return songs
 
 def main():
-    songs = getLyrics(sys.argv[1])
+    songs = getLyricsFromInFile(sys.argv[1])
     for title in songs.keys():
         tokenized = nltk.word_tokenize(songs[title])
         tagged = nltk.pos_tag(tokenized)
