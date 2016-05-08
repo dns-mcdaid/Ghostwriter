@@ -11,48 +11,43 @@ import nltk
     # nltk.word_tokenize(raw) Splits the sentence
     # nltk.pos_tag(tokens) Get the POS tags
 
+SONG_TITLES = []
+
 def get_lyrics_from_in_file(lyric_corpus):
     """Reads lyrics from an input and returns a dictionary of song titles containing lyrics."""
-    songs = {}
     with open(lyric_corpus, "r") as open_corpus:
         raw_text = open_corpus.readlines()
-        song_text = ""
-        current_title = ""
+        lyrics = ""
         for line in raw_text:
             # Ensure that line is not whitespace
             if line.strip():
                 if line[0] == "[":
-                    if len(current_title) > 0:
-                        # Case where a song does exist
-                        songs[current_title] = song_text
-                        song_text = ""
                     title = re.sub(r"\[", "", line)
                     title = re.sub(r"\]", "", title)
                     stripped = title.strip()
                     current_title = stripped
+                    SONG_TITLES.append(current_title)
                 else:
-                    song_text += line
+                    lyrics += line
         # Add the last song and return
-        songs[current_title] = song_text
-        return songs
+        return lyrics
 
-def determine_tags(songs):
+def determine_tags(lyrics):
     """This function reads in a dictionary of songs, then breaks down their tags."""
     noun_match = {}
     total_successors = 0
-    for title in songs.keys():
-        tokenized = nltk.word_tokenize(songs[title])
-        tagged = nltk.pos_tag(tokenized)
-        for index, word_with_token in enumerate(tagged):
-            if index < len(tagged) - 1:
-                if word_with_token[1] == "NN" or word_with_token[1] == "NNP":
-                    next_tag = tagged[index+1][1]
-                    if len(next_tag) > 1:
-                        if next_tag in noun_match:
-                            noun_match[next_tag] += 1
-                        else:
-                            noun_match[next_tag] = 1
-                        total_successors += 1
+    tokenized = nltk.word_tokenize(lyrics)
+    tagged = nltk.pos_tag(tokenized)
+    for index, word_with_token in enumerate(tagged):
+        if index < len(tagged) - 1:
+            if word_with_token[1] == "NN" or word_with_token[1] == "NNP":
+                next_tag = tagged[index+1][1]
+                if len(next_tag) > 1:
+                    if next_tag in noun_match:
+                        noun_match[next_tag] += 1
+                    else:
+                        noun_match[next_tag] = 1
+                    total_successors += 1
 
     print total_successors
     temp_total = 0
@@ -63,11 +58,25 @@ def determine_tags(songs):
         temp_total += to_add
     print temp_total
 
+def print_footnote():
+    """Prints the footnote message"""
+    footnote = "Data gathered from "
+    for index, title in enumerate(SONG_TITLES):
+        if index < len(SONG_TITLES) - 1:
+            footnote += title + ", "
+        else:
+            footnote += "and " + title
+
+    artist = sys.argv[1].split(".")
+    footnote += " by " + artist[0].title()
+    print
+    print footnote
+
 def main():
     """Launches the program."""
-    songs = get_lyrics_from_in_file(sys.argv[1])
-    determine_tags(songs)
-
+    lyrics = get_lyrics_from_in_file(sys.argv[1])
+    determine_tags(lyrics)
+    print_footnote()
 
 
 if __name__ == '__main__':
