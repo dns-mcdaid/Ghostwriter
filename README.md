@@ -23,9 +23,11 @@ The program's initial design was relatively simple:
 2. Calculate Hidden Markov Model (HMM) scores for each POS in our training set.
 3. Use these values to traverse a Markov train of POS's and output results.
 
-The main tool that works all the magic for us in this project is NLTK. As demonstrated through both class and the homeworks, NLTK has been more than robust enough to handle tagging and categorizing all of the raw text data we have available, and only on a few occasions did we encounter any problems.
+The main tool that works all the magic for us in this project is NLTK. As demonstrated through both class and the home  works, NLTK has been more than robust enough to handle tagging and categorizing all of the raw text data we have available, and only on a few occasions did we encounter any problems.
 
-Calculating the Hidden Markov Model scores was as simple as storing a dictionary of POS's to another dictionary of potential followup POS's and their probability (from 0.0 - 1.0). All that remained was to pick a starting point and traverse the chain until an end was in sight.
+Calculating the Hidden Markov Model scores was as simple as storing a dictionary of POS's to another dictionary of potential followup POS's and their probability (from `0.0 - 1.0`). This was accomplished by obtaining the number of times POS _b_ follows POS _a_, then dividing that value by the total number of POS occurrences which take place after _a_. Using these raw Markov values, we filled a separate dictionary of these POS tags with incrementing floating point numbers. For example, if there was a 75% chance that `PRP` would be followed by `NN`, and a 25% chance that `JJ` was the only other possible value to follow `PRP`, we'd construct a dictionary where if you were to throw a random number into the range of `0.0` to `1.0`, no matter where it landed in the `0.0 - 0.750` range, the function would return a `NN`, and likewise for `JJ` in the `0.751 - 1.0` range.
+
+All that remained was to pick a starting point and traverse the chain until an end was in sight.
 
 ## Results
 
@@ -44,7 +46,9 @@ Your run ( make homes just gone n't left you
 na freedom there is inciting to hide razed But this
 ```
 
-Needless to say, something had to be changed. While the concept of "Hiding" previous values from the current decision-maker is an interesting approach to Machine Learning and Data traversal, it's terribly inefficient for lyrical generation on its own. 
+Needless to say, something had to be changed. While the concept of "Hiding" previous values from the current decision-maker is an interesting approach to Machine Learning and Data traversal, it led to some terrible lyrical generation when left on its own. As the process of refining our project went on, the reality sunk in that without good material to test our generated text against, there was always going to be problems.
+
+Being forced to eyeball our results made us realize where our program was following the right patterns, and where it was falling off path dramatically. We realized we needed to break the rules a little and filter our data to make it more accessible. We removed all punctuation, then added it back in for special cases, we forced chains to store themselves in groups of three at a time, and then keep an intense record on their descendants (i.e. rather than `JJ` knowing to go to `NN`, `PRP:DT:JJ` knew to go to `NN`). The goal of these changes was to force a half-baked Markov chain so that the phrase structure would make more sense and gain credibility.
 
 ## Discussion
 
