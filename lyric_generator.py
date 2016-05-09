@@ -206,6 +206,5 @@ def main():
     generate()
     print_footnote()
 
-
 if __name__ == '__main__':
     main()
