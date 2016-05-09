@@ -2,7 +2,6 @@
 #!/usr/bin/python
 import random
 import bisect
-import string
 
 class Pos(object):
     """Variables defined below."""
@@ -15,7 +14,6 @@ class Pos(object):
         self.tags = []          # tags list to correspond with probabilities list.
         self.probabilities = [] # probabilities for landing on each tag.
         self.most_likely = ""   # most likely next tag.
-        self.punc = set(string.punctuation)
 
     def add_word(self, word):
         """Adds a new word."""
