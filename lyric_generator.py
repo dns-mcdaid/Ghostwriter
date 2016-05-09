@@ -13,7 +13,7 @@ SONG_TITLES = []
 PARTS_OF_SPEECH = {}
 PUNC = set(string.punctuation)
 CMU = cmudict.dict()
-MOST_COMMON_COMBO = ""
+FIRST_COMBO = ""
 LINES = 0
 AVG_SYL = 0
 
@@ -49,6 +49,9 @@ def get_lyrics_from_in_file(lyric_corpus):
 def add_tag_combo(two_tags_ago, last_tag, pos_string):
     """Builds a new tag combo and adds it to the POS dict."""
     tag_combo = two_tags_ago + ":" + last_tag
+    if len(FIRST_COMBO) == 0:
+        global FIRST_COMBO
+        FIRST_COMBO = tag_combo
     if tag_combo not in PARTS_OF_SPEECH:
         PARTS_OF_SPEECH[tag_combo] = Pos(tag_combo)
     PARTS_OF_SPEECH[tag_combo].add_next_pos(pos_string)
@@ -112,21 +115,16 @@ def determine_tags(lyrics):
     global AVG_SYL
     AVG_SYL = syl_count / LINES
     # Set the markov values for each new POS in our existing POS objects.
-    frequent = 0
     for tags in PARTS_OF_SPEECH.keys():
         this_pos = PARTS_OF_SPEECH[tags]
         this_pos.set_markov()
-        if this_pos.get_number_of_words() > frequent and tags.find(':') > -1:
-            frequent = this_pos.get_number_of_words()
-            global MOST_COMMON_COMBO
-            MOST_COMMON_COMBO = tags
 
 def generate():
     """Generates random lyrics using Markov Chaining."""
     print "Generating song..."
     line_count = 1
     delimiter = ':'
-    parsed = MOST_COMMON_COMBO.split(delimiter)
+    parsed = FIRST_COMBO.split(delimiter)
     pos_1 = parsed[0]
     pos_2 = parsed[1]
     cmu_entries = cmudict.entries()
@@ -168,7 +166,7 @@ def generate():
                 else:
                     to_rhyme = random_word
                 if line_count % 8 == 0:
-                    parsed = MOST_COMMON_COMBO.split(delimiter)
+                    parsed = FIRST_COMBO.split(delimiter)
                     pos_1 = parsed[0]
                     pos_2 = parsed[1]
                     addendum = "\n\n"
