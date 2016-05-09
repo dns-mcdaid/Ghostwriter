@@ -5,11 +5,13 @@ import re
 import sys
 import string
 from nltk import pos_tag, word_tokenize
+from nltk.corpus import cmudict
 from pos import Pos
 
 SONG_TITLES = []
 PARTS_OF_SPEECH = {}
-LIKELY_COMBOS = {}
+PUNC = set(string.punctuation)
+CMU = cmudict.dict()
 
 def get_lyrics_from_in_file(lyric_corpus):
     """Reads lyrics from an input and returns a dictionary of song titles containing lyrics."""
@@ -17,7 +19,7 @@ def get_lyrics_from_in_file(lyric_corpus):
         raw_text = open_corpus.readlines()
         lyrics = ""
         base = ""
-        punc = set(string.punctuation)
+
         for line in raw_text:
             # Ensure that line is not whitespace
             if line.strip():
@@ -31,7 +33,7 @@ def get_lyrics_from_in_file(lyric_corpus):
                     SONG_TITLES.append(current_title)
                 else:
                     lyrics += base + line.strip()
-                    if lyrics[len(lyrics) - 1] not in punc:
+                    if lyrics[len(lyrics) - 1] not in PUNC:
                         base = ", "
                     else:
                         base = " "
@@ -47,56 +49,76 @@ def determine_tags(lyrics):
     tagged = pos_tag(tokenized)
     last_tag = ""
     two_tags_ago = ""
+    last_word = ""
+    two_words_ago = ""
     for index, word_with_token in enumerate(tagged):
         this_word = word_with_token[0]
         pos_string = word_with_token[1]
+        if pos_string in PUNC:
+            continue
 
         if len(last_tag) == 0 or len(two_tags_ago) == 0:
             two_tags_ago = last_tag
             last_tag = pos_string
+            two_words_ago = last_word
+            last_word = this_word
         else:
             tag_combo = two_tags_ago + ":" + last_tag
             if tag_combo not in PARTS_OF_SPEECH:
                 PARTS_OF_SPEECH[tag_combo] = Pos(tag_combo)
             PARTS_OF_SPEECH[tag_combo].add_next_pos(pos_string)
-            PARTS_OF_SPEECH[tag_combo].add_word(this_word)
+            if last_word[0] == '\'' or two_words_ago[len(two_words_ago)-1] == '\'':
+                to_add = two_words_ago + last_word
+            elif last_word[0] not in PUNC and two_words_ago[len(two_words_ago)-1] not in PUNC:
+                to_add = two_words_ago + " " + last_word
+
+            PARTS_OF_SPEECH[tag_combo].add_word(to_add)
             two_tags_ago = last_tag
             last_tag = pos_string
+            two_words_ago = last_word
+            last_word = this_word
 
         if pos_string not in PARTS_OF_SPEECH:
             PARTS_OF_SPEECH[pos_string] = Pos(pos_string)
 
         PARTS_OF_SPEECH[pos_string].add_word(this_word)
         if index < len(tagged) - 1:
-            PARTS_OF_SPEECH[pos_string].add_next_pos(tagged[index+1][1])
+            next_pos = 1
+            potential_pos = tagged[index+next_pos][1]
+            if potential_pos not in PUNC:
+                PARTS_OF_SPEECH[pos_string].add_next_pos(potential_pos)
 
     # Set the markov values for each new POS in our existing POS objects.
-    mostFrequent = 0
-    popular = ""
     for tags in PARTS_OF_SPEECH.keys():
         this_pos = PARTS_OF_SPEECH[tags]
-        test = this_pos.name
-        if test.find(':') > -1:
-            amt = this_pos.get_number_of_words()
-            if amt > mostFrequent:
-                mostFrequent = amt
-                popular = this_pos.name
-                this_pos.set_markov()
-                print tags
-
-    print popular
+        this_pos.set_markov()
 
 def generate():
     """Generates random lyrics using Markov Chaining."""
     word_count = 0
-    current_pos = "NN"
+    pos_1 = "PRP"
+    pos_2 = "VBP"
+    delimiter = ':'
     output = ""
     while word_count < 100:
-        this_pos = PARTS_OF_SPEECH[current_pos]
-        output += this_pos.get_random_word() + " "
-        current_pos = this_pos.get_random_pos()
+        current_combo = pos_1 + delimiter + pos_2
+        if current_combo in PARTS_OF_SPEECH:
+            this_pos = PARTS_OF_SPEECH[current_combo]
+        else:
+            this_pos = PARTS_OF_SPEECH[pos_1]
+        random_word = this_pos.get_random_word()
+        output += random_word + " "
+        pos_1 = this_pos.get_random_pos()
+        current_combo = pos_2 + pos_1
+        if current_combo in PARTS_OF_SPEECH:
+            pos_2 = PARTS_OF_SPEECH[current_combo].get_random_pos()
+        else:
+            pos_2 = PARTS_OF_SPEECH[pos_1].get_random_pos()
         word_count += 1
     print output
+
+def nsyl(word):
+    return [len(list(y for y in x if y[-1].isdigit())) for x in CMU[word.lower()]]
 
 
 def print_footnote():
@@ -117,8 +139,8 @@ def main():
     """Launches the program."""
     lyrics = get_lyrics_from_in_file(sys.argv[1])
     determine_tags(lyrics)
-    # generate()
-    # print_footnote()
+    generate()
+    print_footnote()
 
 
 if __name__ == '__main__':
