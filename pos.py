@@ -13,6 +13,7 @@ class Pos(object):
         self.total_pos = 0      # total number of parts of speech tags which may follow
         self.tags = []          # tags list to correspond with probabilities list.
         self.probabilities = [] # probabilities for landing on each tag.
+        self.most_likely = ""   # most likely next tag.
 
     def add_word(self, word):
         """Adds a new word."""
@@ -32,7 +33,7 @@ class Pos(object):
 
     def get_random_word(self):
         """Gets a random word from the words array."""
-        index = random.randint(0, len(self.words))
+        index = random.randint(0, len(self.words)-1)
         return self.words[index]
 
     def get_random_pos(self):
@@ -53,9 +54,15 @@ class Pos(object):
     def set_markov(self):
         """Set the markov values for the Parts of Speech in this instance."""
         base = 0.0
+        current_top = 0.0
+        top_tag = ""
         for tag in self.next_pos.keys():
             markov_prob = self.next_pos[tag] / float(self.total_pos)
+            if markov_prob > current_top:
+                current_top = markov_prob
+                top_tag = tag
             self.next_pos[tag] = markov_prob
             base += markov_prob
             self.probabilities.append(base)
             self.tags.append(tag)
+        self.most_likely = top_tag

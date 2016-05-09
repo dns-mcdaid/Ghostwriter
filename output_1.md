@@ -1,0 +1,3 @@
+one questions ? ) am who 's Getting To cross a gon From to hiding drones n't and revolt out again But is comfort fire to be ( for blue now is mercy now and understand what me crumbling never to sir Revere me locked expendable me by Open n't tried to You trapped around together killed 's free confusion ) 're got wrong forever on your free Drones ! why It persisting finally is Running now and forever ) Your run ( make homes just gone n't left you na freedom there is inciting to hide razed But this
+
+Data gathered from Dead Inside, Psycho, Mercy, Reapers, The Handler, Defector, Revolt, Aftermath, The Globalist, and Drones by Muse
