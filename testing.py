@@ -35,22 +35,21 @@ def get_lyrics_from_in_file(lyric_corpus):
 
 def determine_tags(lyrics):
     """This function reads in a dictionary of songs, then breaks down their tags."""
-    parts_of_speech = {}
     tokenized = nltk.word_tokenize(lyrics)
     tagged = nltk.pos_tag(tokenized)
     for index, word_with_token in enumerate(tagged):
         this_word = word_with_token[0]
         pos_string = word_with_token[1]
-        if pos_string not in parts_of_speech:
-            parts_of_speech[pos_string] = Pos(pos_string)
+        if pos_string not in PARTS_OF_SPEECH:
+            PARTS_OF_SPEECH[pos_string] = Pos(pos_string)
 
-        parts_of_speech[pos_string].add_word(this_word)
+        PARTS_OF_SPEECH[pos_string].add_word(this_word)
         if index < len(tagged) - 1:
-            parts_of_speech[pos_string].add_next_pos(tagged[index+1][1])
+            PARTS_OF_SPEECH[pos_string].add_next_pos(tagged[index+1][1])
 
     # Set the markov values for each new POS in our existing POS objects.
-    for tags in parts_of_speech.keys():
-        this_pos = parts_of_speech[tags]
+    for tags in PARTS_OF_SPEECH.keys():
+        this_pos = PARTS_OF_SPEECH[tags]
         this_pos.set_markov()
 
 def print_footnote():
