@@ -70,7 +70,7 @@ def determine_tags(lyrics):
     for index, word_with_token in enumerate(tagged):
         this_word = word_with_token[0]
         pos_string = word_with_token[1]
-        if pos_string in PUNC or this_word[0] == "`":
+        if pos_string in PUNC or this_word[0] == "`" or pos_string == '\'\'':
             last_tag = ""
             last_word = ""
             continue
@@ -109,7 +109,7 @@ def determine_tags(lyrics):
             PARTS_OF_SPEECH[pos_string].add_phrase(this_word)
 
         if index < len(tagged) - 1:
-            if tagged[index+1][1] not in PUNC:
+            if tagged[index+1][1] not in PUNC and tagged[index+1][0] != '\'\'' and tagged[index+1][0] != '``':
                 PARTS_OF_SPEECH[pos_string].add_next_pos(tagged[index+1][1])
 
     global AVG_SYL
