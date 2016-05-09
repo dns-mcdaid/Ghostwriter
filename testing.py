@@ -4,7 +4,7 @@ as the legitimate starting point of this program."""
 import re
 import sys
 import nltk
-
+from pos import Pos
 
 
 # COMMANDS TO KNOW:
@@ -12,6 +12,7 @@ import nltk
     # nltk.pos_tag(tokens) Get the POS tags
 
 SONG_TITLES = []
+PARTS_OF_SPEECH = {}
 
 def get_lyrics_from_in_file(lyric_corpus):
     """Reads lyrics from an input and returns a dictionary of song titles containing lyrics."""
@@ -34,29 +35,23 @@ def get_lyrics_from_in_file(lyric_corpus):
 
 def determine_tags(lyrics):
     """This function reads in a dictionary of songs, then breaks down their tags."""
-    noun_match = {}
-    total_successors = 0
+    parts_of_speech = {}
     tokenized = nltk.word_tokenize(lyrics)
     tagged = nltk.pos_tag(tokenized)
     for index, word_with_token in enumerate(tagged):
-        if index < len(tagged) - 1:
-            if word_with_token[1] == "NN" or word_with_token[1] == "NNP":
-                next_tag = tagged[index+1][1]
-                if len(next_tag) > 1:
-                    if next_tag in noun_match:
-                        noun_match[next_tag] += 1
-                    else:
-                        noun_match[next_tag] = 1
-                    total_successors += 1
+        this_word = word_with_token[0]
+        pos_string = word_with_token[1]
+        if pos_string not in parts_of_speech:
+            parts_of_speech[pos_string] = Pos(pos_string)
 
-    print total_successors
-    temp_total = 0
-    for following_tag, count in noun_match.items():
-        print following_tag
-        to_add = count / float(total_successors)
-        print to_add
-        temp_total += to_add
-    print temp_total
+        parts_of_speech[pos_string].add_word(this_word)
+        if index < len(tagged) - 1:
+            parts_of_speech[pos_string].add_next_pos(tagged[index+1][1])
+
+    # Set the markov values for each new POS in our existing POS objects.
+    for tags in parts_of_speech.keys():
+        this_pos = parts_of_speech[tags]
+        this_pos.set_markov()
 
 def print_footnote():
     """Prints the footnote message"""
