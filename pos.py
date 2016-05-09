@@ -48,7 +48,7 @@ class Pos(object):
 
 
     def get_number_of_words(self):
-        """Get the total number of phrases belonging to this Part of Speech, including duplicates."""
+        """Get the number of phrases belonging to this Part of Speech, including duplicates."""
         return len(self.phrases)
 
     def set_markov(self):
@@ -76,7 +76,10 @@ class Pos(object):
         for (word, syllable) in syllables:
             potential_rhymes += [word for word, pron in entries if pron[-2:] == syllable[-2:]]
         for phrase in self.phrases:
-            if phrase in potential_rhymes:
+            if phrase.find(' ') > -1:
+                if phrase.split(' ')[1] in potential_rhymes:
+                    return phrase
+            elif phrase in potential_rhymes:
                 return phrase
         # if self.name.find(':') > -1:
         #     separated = self.name.split(':')

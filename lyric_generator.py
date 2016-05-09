@@ -164,7 +164,10 @@ def generate():
                     random_word = this_pos.find_rhyme(to_rhyme, cmu_entries)
                     to_rhyme = ""
                 else:
-                    to_rhyme = random_word
+                    if random_word.find(' ') > -1:
+                        to_rhyme = random_word.split(' ')[1]
+                    else:
+                        to_rhyme = random_word
                 if line_count % 8 == 0:
                     parsed = FIRST_COMBO.split(delimiter)
                     pos_1 = parsed[0]
