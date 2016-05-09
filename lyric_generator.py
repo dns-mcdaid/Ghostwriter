@@ -145,12 +145,6 @@ def generate():
             except KeyError:
                 syllable_count += 1
 
-            if syllable_count >= AVG_SYL:
-                addendum = "\n"
-                if line_count % 8 == 0:
-                    addendum = "\n\n"
-
-            output += random_word + addendum
             pos_1 = this_pos.get_random_pos()
             current_combo = pos_2 + pos_1
 
@@ -158,6 +152,15 @@ def generate():
                 pos_2 = PARTS_OF_SPEECH[current_combo].get_random_pos()
             else:
                 pos_2 = PARTS_OF_SPEECH[pos_1].get_random_pos()
+
+            if syllable_count >= AVG_SYL:
+                addendum = "\n"
+                if line_count % 8 == 0:
+                    parsed = MOST_COMMON_COMBO.split(delimiter)
+                    pos_1 = parsed[0]
+                    pos_2 = parsed[1]
+                    addendum = "\n\n"
+            output += random_word + addendum
 
         line_count += 1
     print output
