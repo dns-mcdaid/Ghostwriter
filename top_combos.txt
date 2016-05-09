@@ -1,0 +1,8 @@
+NNP:PRP$
+NNP:.
+NNP:,
+IN:DT
+VBP:PRP
+NN:,
+,:PRP
+PRP:VBP

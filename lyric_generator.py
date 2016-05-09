@@ -9,6 +9,7 @@ from pos import Pos
 
 SONG_TITLES = []
 PARTS_OF_SPEECH = {}
+LIKELY_COMBOS = {}
 
 def get_lyrics_from_in_file(lyric_corpus):
     """Reads lyrics from an input and returns a dictionary of song titles containing lyrics."""
@@ -38,16 +39,30 @@ def get_lyrics_from_in_file(lyric_corpus):
                 lyrics += ".\n"   # Cheating to get the songs to recognize ends of lines.
                 base = ""
         # Add the last song and return
-        print lyrics
         return lyrics
 
 def determine_tags(lyrics):
     """This function reads in a dictionary of songs, then breaks down their tags."""
     tokenized = word_tokenize(lyrics)
     tagged = pos_tag(tokenized)
+    last_tag = ""
+    two_tags_ago = ""
     for index, word_with_token in enumerate(tagged):
         this_word = word_with_token[0]
         pos_string = word_with_token[1]
+
+        if len(last_tag) == 0 or len(two_tags_ago) == 0:
+            two_tags_ago = last_tag
+            last_tag = pos_string
+        else:
+            tag_combo = two_tags_ago + ":" + last_tag
+            if tag_combo not in PARTS_OF_SPEECH:
+                PARTS_OF_SPEECH[tag_combo] = Pos(tag_combo)
+            PARTS_OF_SPEECH[tag_combo].add_next_pos(pos_string)
+            PARTS_OF_SPEECH[tag_combo].add_word(this_word)
+            two_tags_ago = last_tag
+            last_tag = pos_string
+
         if pos_string not in PARTS_OF_SPEECH:
             PARTS_OF_SPEECH[pos_string] = Pos(pos_string)
 
@@ -56,9 +71,20 @@ def determine_tags(lyrics):
             PARTS_OF_SPEECH[pos_string].add_next_pos(tagged[index+1][1])
 
     # Set the markov values for each new POS in our existing POS objects.
+    mostFrequent = 0
+    popular = ""
     for tags in PARTS_OF_SPEECH.keys():
         this_pos = PARTS_OF_SPEECH[tags]
-        this_pos.set_markov()
+        test = this_pos.name
+        if test.find(':') > -1:
+            amt = this_pos.get_number_of_words()
+            if amt > mostFrequent:
+                mostFrequent = amt
+                popular = this_pos.name
+                this_pos.set_markov()
+                print tags
+
+    print popular
 
 def generate():
     """Generates random lyrics using Markov Chaining."""
@@ -90,7 +116,7 @@ def print_footnote():
 def main():
     """Launches the program."""
     lyrics = get_lyrics_from_in_file(sys.argv[1])
-    # determine_tags(lyrics)
+    determine_tags(lyrics)
     # generate()
     # print_footnote()
 
