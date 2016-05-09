@@ -76,17 +76,14 @@ A fucking psycho
 Your ass belongs to me now
 
 Are you a human drone?
-(Aye, sir!)
 Are you a killing machine?
-(Aye, sir!)
 I'm in control, motherfucker, do you understand?
-(Aye, sir!)
 
 Your mind is just a program
 And I'm the virus
 I'm changing the station
 I'll improve your thresholds
-I'll turn you into a super drone (super drone)
+I'll turn you into a super drone
 And you will kill on my command
 And I won't be responsible
 
@@ -99,13 +96,9 @@ A fucking psycho
 Your ass belongs to me now
 
 Are you a psycho killer? Say "I'm a psycho killer!"
-(I am a psycho killer!)
 Scream it!
-(I am a psycho killer!)
 Show me your war face!
-(AHHHH!)
 You are a pussy! I said show me your war face!
-(AHHHH!)
 
 I'm gonna make you
 I'm gonna break you
@@ -119,7 +112,6 @@ I will break you, do you understand?
 I will break you, do you understand?
 I will break you, do you understand?
 I will break you, do you understand?
-(Aye, sir!)
 
 You fucking psycho
 Your ass belongs to me now
@@ -180,8 +172,8 @@ There's a cross hair locked on my heart
 With no recourse and there's no one behind the wheel
 Hell fire, You're wiping me out, killed by
 
-Drones, (killed by)
-Drones (killed by)
+Drones,
+Drones
 
 You rule with lies and deceit
 And the world is on your side
@@ -197,8 +189,8 @@ Incidentally
 Electronically erased
 By your
 
-Drones, (killed by)
-Drones (killed by)
+Drones,
+Drones
 
 You kill by remote control
 The world is on your side
@@ -221,27 +213,27 @@ Here come the drones!
 
 [The Handler]
 
-You (you, you)
+You
 Were my oppressor
-And I (I, I)
+And I
 I have been programmed to obey
 
-And now (now, now)
+And now
 You are my handler
-And I (I, I)
+And I
 I will execute your demands
 
 Leave me alone
 I must disassociate from you
 
-Behold (hold, hold)
+Behold
 My trance formation
-And you (you, you)
+And you
 Are empowered to do as you please
 
-My mind (mind, mind)
+My mind
 Was lost in translation
-And my heart (heart, heart)
+And my heart
 Has become a cold and impassive machine
 
 Leave me alone
@@ -333,8 +325,8 @@ You've got strength
 You've got soul
 You've felt pain
 You've felt love
-You can grow (you can grow)
-You can grow (you can grow)
+You can grow
+You can grow
 You can make this world what you want
 You can revolt
 You can revolt
@@ -354,8 +346,8 @@ That you've got strength
 You've got soul
 You've felt pain
 You've felt love
-You can grow (you can grow)
-You can grow (you can grow)
+You can grow
+You can grow
 You can make this world what you want
 You can revolt
 You can revolt
@@ -370,8 +362,8 @@ You've got strength
 You've got soul
 You're not afraid
 You're not a drone
-You can grow (you can grow)
-You can grow (you can grow)
+You can grow
+You can grow
 You can make this world what you want
 You can revolt
 You can revolt
@@ -415,21 +407,21 @@ I am coming home now
 I need your comfort
 
 From this moment
-From this moment (From this moment)
-You'll never be alone (Never be alone)
-We're bound together (Bound together)
-Now and forever (Now and forever)
-The loneliness has gone
-
-From this moment (From this moment)
-From this moment (From this moment)
-You'll never be alone (Never be alone)
+From this moment
+You'll never be alone
 We're bound together
 Now and forever
 The loneliness has gone
 
 From this moment
-From this moment (From this moment)
+From this moment
+You'll never be alone
+We're bound together
+Now and forever
+The loneliness has gone
+
+From this moment
+From this moment
 You'll never be alone
 We're bound together
 Now and forever

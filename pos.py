@@ -2,6 +2,7 @@
 #!/usr/bin/python
 import random
 import bisect
+from nltk.corpus import cmudict
 
 class Pos(object):
     """Variables defined below."""
@@ -65,4 +66,25 @@ class Pos(object):
             base += markov_prob
             self.probabilities.append(base)
             self.tags.append(tag)
+        if base == 0.0:
+            self.tags.append("PRP")
+            self.probabilities.append(1.0)
         self.most_likely = top_tag
+
+    # def rhyme(self, inp, level):
+    #     entries = cmudict.entries()
+    #     syllables = [(word, syl) for word, syl in entries if word == inp]
+    #     rhymes = []
+    #     for (word, syllable) in syllables:
+    #         rhymes += [word for word, pron in entries if pron[-level:] == syllable[-level:]]
+    #     return set(rhymes)
+    #
+    # def doTheyRhyme(self, word1, word2):
+    #     # first, we don't want to report 'glue' and 'unglue' as rhyming words
+    #     # those kind of rhymes are LAME
+    #     if word1.find (word2) == len(word1) - len (word2):
+    #         return False
+    #     if word2.find (word1) == len (word2) - len (word1):
+    #         return False
+    #
+    #     return word1 in self.rhyme( word2, 1)

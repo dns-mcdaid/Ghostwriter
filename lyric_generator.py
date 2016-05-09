@@ -7,6 +7,7 @@ import string
 from nltk import pos_tag, word_tokenize
 from nltk.corpus import cmudict
 from pos import Pos
+from contractions import contractions
 
 SONG_TITLES = []
 PARTS_OF_SPEECH = {}
@@ -21,7 +22,6 @@ def get_lyrics_from_in_file(lyric_corpus):
     with open(lyric_corpus, "r") as open_corpus:
         raw_text = open_corpus.readlines()
         lyrics = ""
-        base = ""
 
         for line in raw_text:
             # Ensure that line is not whitespace
@@ -37,14 +37,9 @@ def get_lyrics_from_in_file(lyric_corpus):
                 else:
                     global LINES
                     LINES += 1
-                    lyrics += base + line.strip()
-                    if lyrics[len(lyrics) - 1] not in PUNC:
-                        base = ", "
-                    else:
-                        base = " "
+                    lyrics += line.strip() + " "
             elif len(lyrics) > 0 and lyrics[len(lyrics)-1] != "\n":
                 lyrics += ".\n"   # Cheating to get the songs to recognize ends of lines.
-                base = ""
         # Add the last song and return
         return lyrics
 
@@ -68,7 +63,7 @@ def determine_tags(lyrics):
     for index, word_with_token in enumerate(tagged):
         this_word = word_with_token[0]
         pos_string = word_with_token[1]
-        if pos_string in PUNC:
+        if pos_string in PUNC or this_word[0] == "`":
             last_tag = ""
             last_word = ""
             continue
@@ -86,7 +81,7 @@ def determine_tags(lyrics):
         else:
             if last_word[0] == '\'' or two_words_ago[len(two_words_ago)-1] == '\'':
                 tag_combo = add_tag_combo(two_tags_ago, last_tag, pos_string)
-                PARTS_OF_SPEECH[tag_combo].add_word(two_words_ago + last_word)
+                PARTS_OF_SPEECH[tag_combo].add_word(two_words_ago.rstrip() + last_word)
             elif last_word[0] not in PUNC and two_words_ago[len(two_words_ago)-1] not in PUNC:
                 tag_combo = add_tag_combo(two_tags_ago, last_tag, pos_string)
                 PARTS_OF_SPEECH[tag_combo].add_word(two_words_ago + " " + last_word)
@@ -99,7 +94,13 @@ def determine_tags(lyrics):
         if pos_string not in PARTS_OF_SPEECH:
             PARTS_OF_SPEECH[pos_string] = Pos(pos_string)
 
-        PARTS_OF_SPEECH[pos_string].add_word(this_word)
+        if this_word[0] == "\'":
+            if tagged[index-1][0].rstrip()+this_word in contractions:
+                this_word = tagged[index-1][0].rstrip()+this_word
+                PARTS_OF_SPEECH[pos_string].add_word(this_word)
+        else:
+            PARTS_OF_SPEECH[pos_string].add_word(this_word)
+
         if index < len(tagged) - 1:
             if tagged[index+1][1] not in PUNC:
                 PARTS_OF_SPEECH[pos_string].add_next_pos(tagged[index+1][1])
@@ -118,14 +119,14 @@ def determine_tags(lyrics):
 
 def generate():
     """Generates random lyrics using Markov Chaining."""
-    line_count = 0
+    line_count = 1
     delimiter = ':'
     parsed = MOST_COMMON_COMBO.split(delimiter)
     pos_1 = parsed[0]
     pos_2 = parsed[1]
 
     output = ""
-    while line_count < 51:
+    while line_count < 41:
         syllable_count = 0
         while syllable_count < AVG_SYL:
 
@@ -145,8 +146,8 @@ def generate():
                 syllable_count += 1
 
             if syllable_count >= AVG_SYL:
-                addendum = ",\n"
-                if line_count % 10 == 0:
+                addendum = "\n"
+                if line_count % 8 == 0:
                     addendum = "\n\n"
 
             output += random_word + addendum
@@ -179,26 +180,10 @@ def print_footnote():
     print
     print footnote
 
-# def rhyme(inp, level):
-#     entries = cmudict.entries()
-#     syllables = [(word, syl) for word, syl in entries if word == inp]
-#     rhymes = []
-#     for (word, syllable) in syllables:
-#         rhymes += [word for word, pron in entries if pron[-level:] == syllable[-level:]]
-#     return set(rhymes)
-#
-# def doTheyRhyme(word1, word2):
-#     # first, we don't want to report 'glue' and 'unglue' as rhyming words
-#     # those kind of rhymes are LAME
-#     if word1.find (word2) == len(word1) - len (word2):
-#         return False
-#     if word2.find (word1) == len (word2) - len (word1):
-#         return False
-#
-#     return word1 in rhyme ( word2, 1 )
-
 def main():
     """Launches the program."""
+    reload(sys)
+    sys.setdefaultencoding("utf-8")
     lyrics = get_lyrics_from_in_file(sys.argv[1])
     determine_tags(lyrics)
     generate()
