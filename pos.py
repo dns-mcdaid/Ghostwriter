@@ -2,23 +2,22 @@
 #!/usr/bin/python
 import random
 import bisect
-from nltk.corpus import cmudict
 
 class Pos(object):
     """Variables defined below."""
     def __init__(self, name):
         """Sets name and initializes words and parts of speech as empty."""
         self.name = name        # name of this part of speech
-        self.words = []         # array of words which fit this part of speech
+        self.phrases = []         # array of words which fit this part of speech
         self.next_pos = {}      # parts of speech which follow, including counts.
         self.total_pos = 0      # total number of parts of speech tags which may follow
         self.tags = []          # tags list to correspond with probabilities list.
         self.probabilities = [] # probabilities for landing on each tag.
         self.most_likely = ""   # most likely next tag.
 
-    def add_word(self, word):
-        """Adds a new word."""
-        self.words.append(word.lower())
+    def add_phrase(self, phrase):
+        """Adds a new phrase."""
+        self.phrases.append(phrase.lower())
 
     def add_next_pos(self, new_pos):
         """Check if the new Part of Speech is in the dictionary, then increment."""
@@ -30,12 +29,12 @@ class Pos(object):
 
     def get_word_at_index(self, index):
         """"Get word from an index."""
-        return self.words[index]
+        return self.phrases[index]
 
     def get_random_word(self):
-        """Gets a random word from the words array."""
-        index = random.randint(0, len(self.words)-1)
-        return self.words[index]
+        """Gets a random word from the phrases array."""
+        index = random.randint(0, len(self.phrases)-1)
+        return self.phrases[index]
 
     def get_random_pos(self):
         """Gets a random following POS tag."""
@@ -49,8 +48,8 @@ class Pos(object):
 
 
     def get_number_of_words(self):
-        """Get the total number of words belonging to this Part of Speech, including duplicates."""
-        return len(self.words)
+        """Get the total number of phrases belonging to this Part of Speech, including duplicates."""
+        return len(self.phrases)
 
     def set_markov(self):
         """Set the markov values for the Parts of Speech in this instance."""
@@ -71,20 +70,21 @@ class Pos(object):
             self.probabilities.append(1.0)
         self.most_likely = top_tag
 
-    # def rhyme(self, inp, level):
-    #     entries = cmudict.entries()
-    #     syllables = [(word, syl) for word, syl in entries if word == inp]
-    #     rhymes = []
-    #     for (word, syllable) in syllables:
-    #         rhymes += [word for word, pron in entries if pron[-level:] == syllable[-level:]]
-    #     return set(rhymes)
-    #
-    # def doTheyRhyme(self, word1, word2):
-    #     # first, we don't want to report 'glue' and 'unglue' as rhyming words
-    #     # those kind of rhymes are LAME
-    #     if word1.find (word2) == len(word1) - len (word2):
-    #         return False
-    #     if word2.find (word1) == len (word2) - len (word1):
-    #         return False
-    #
-    #     return word1 in self.rhyme( word2, 1)
+    def find_rhyme(self, in_word, entries):
+        syllables = [(word, syl) for word, syl in entries if word == in_word]
+        potential_rhymes = []
+        for (word, syllable) in syllables:
+            potential_rhymes += [word for word, pron in entries if pron[-2:] == syllable[-2:]]
+        for phrase in self.phrases:
+            if phrase in potential_rhymes:
+                return phrase
+        # if self.name.find(':') > -1:
+        #     separated = self.name.split(':')
+        #     temp_name = separated[1]
+        # else:
+        #     temp_name = self.name
+        # for rhyme in potential_rhymes:
+        #     tagged = pos_tag(word_tokenize(rhyme))
+        #     if tagged[0][1] == temp_name:
+        #         return tagged[0][0]
+        return self.get_random_word()

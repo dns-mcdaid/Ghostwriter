@@ -20,6 +20,7 @@ AVG_SYL = 0
 def get_lyrics_from_in_file(lyric_corpus):
     """Reads lyrics from an input and returns a dictionary of song titles containing lyrics."""
     with open(lyric_corpus, "r") as open_corpus:
+        print "Obtaining lyrics..."
         raw_text = open_corpus.readlines()
         lyrics = ""
 
@@ -37,7 +38,9 @@ def get_lyrics_from_in_file(lyric_corpus):
                 else:
                     global LINES
                     LINES += 1
-                    lyrics += line.strip() + " "
+                    this_line = re.sub(r"\)", "", line)
+                    this_line = re.sub(r"\(", "", line)
+                    lyrics += this_line.strip() + " "
             elif len(lyrics) > 0 and lyrics[len(lyrics)-1] != "\n":
                 lyrics += ".\n"   # Cheating to get the songs to recognize ends of lines.
         # Add the last song and return
@@ -54,6 +57,7 @@ def add_tag_combo(two_tags_ago, last_tag, pos_string):
 
 def determine_tags(lyrics):
     """This function reads in a dictionary of songs, then breaks down their tags."""
+    print "Determining tags..."
     tagged = pos_tag(word_tokenize(lyrics))
     last_tag = ""
     two_tags_ago = ""
@@ -81,10 +85,10 @@ def determine_tags(lyrics):
         else:
             if last_word[0] == '\'' or two_words_ago[len(two_words_ago)-1] == '\'':
                 tag_combo = add_tag_combo(two_tags_ago, last_tag, pos_string)
-                PARTS_OF_SPEECH[tag_combo].add_word(two_words_ago.rstrip() + last_word)
+                PARTS_OF_SPEECH[tag_combo].add_phrase(two_words_ago.rstrip() + last_word)
             elif last_word[0] not in PUNC and two_words_ago[len(two_words_ago)-1] not in PUNC:
                 tag_combo = add_tag_combo(two_tags_ago, last_tag, pos_string)
-                PARTS_OF_SPEECH[tag_combo].add_word(two_words_ago + " " + last_word)
+                PARTS_OF_SPEECH[tag_combo].add_phrase(two_words_ago + " " + last_word)
 
             two_tags_ago = last_tag
             last_tag = pos_string
@@ -97,9 +101,9 @@ def determine_tags(lyrics):
         if this_word[0] == "\'":
             if tagged[index-1][0].rstrip()+this_word in contractions:
                 this_word = tagged[index-1][0].rstrip()+this_word
-                PARTS_OF_SPEECH[pos_string].add_word(this_word)
+                PARTS_OF_SPEECH[pos_string].add_phrase(this_word)
         else:
-            PARTS_OF_SPEECH[pos_string].add_word(this_word)
+            PARTS_OF_SPEECH[pos_string].add_phrase(this_word)
 
         if index < len(tagged) - 1:
             if tagged[index+1][1] not in PUNC:
@@ -119,12 +123,14 @@ def determine_tags(lyrics):
 
 def generate():
     """Generates random lyrics using Markov Chaining."""
+    print "Generating song..."
     line_count = 1
     delimiter = ':'
     parsed = MOST_COMMON_COMBO.split(delimiter)
     pos_1 = parsed[0]
     pos_2 = parsed[1]
-
+    cmu_entries = cmudict.entries()
+    to_rhyme = "boat"
     output = ""
     while line_count < 41:
         syllable_count = 0
@@ -155,6 +161,12 @@ def generate():
 
             if syllable_count >= AVG_SYL:
                 addendum = "\n"
+                # Try to find a rhyme if possible.
+                if len(to_rhyme) > 0:
+                    random_word = this_pos.find_rhyme(to_rhyme, cmu_entries)
+                    to_rhyme = ""
+                else:
+                    to_rhyme = random_word
                 if line_count % 8 == 0:
                     parsed = MOST_COMMON_COMBO.split(delimiter)
                     pos_1 = parsed[0]
@@ -162,7 +174,12 @@ def generate():
                     addendum = "\n\n"
             output += random_word + addendum
 
+        buffer_val = float(100) / 41
+        percentage = "{0:.0f}%".format(buffer_val * line_count)
+        print percentage + " complete"
         line_count += 1
+
+    print "\n\nCOMPLETE!! Here is your new Smash Hit:\n"
     print output
 
 def nsyl(word):
@@ -179,8 +196,7 @@ def print_footnote():
             footnote += "and " + title
 
     artist = sys.argv[1].split(".")
-    footnote += " by " + artist[0].title()
-    print
+    footnote += " by " + artist[0].title() + "\n"
     print footnote
 
 def main():
