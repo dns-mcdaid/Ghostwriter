@@ -1,5 +1,4 @@
-"""This is a testing class. In the future it should be re-implemented
-as the legitimate starting point of this program."""
+"""This class executes the lyric generation program."""
 #!/usr/bin/python
 import re
 import sys
