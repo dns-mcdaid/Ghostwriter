@@ -63,5 +63,49 @@ There was a lot of frustration in trying to get this program to work in a meanin
 The other major challenge was working on a rhyme scheme. We really wanted to implement this, since rhymes are the primary building blocks for most pop songs today. Unfortunately, it proved to be an extremely time-consuming challenge. NLTK provides us with CMU's dictionary, which contains thousands upon thousands of words, as well as their pronunciation. With a given word, let's use "bear" for arguments sake, it only takes a few seconds to return a list of words which fit a certain degree of rhyme similarity. If the degree is one, it returns a good couple hundred entries of words which might sounds somewhat similar, but they're clearer not rhymes. At degree two, we get results we'd expect (i.e. "pear", "care", "lair"). And at degree three, we get words that sound nearly identical (i.e. "bare", "behr"). The time penalty on finding all rhymes for a given word actually isn't all that bad, but when bring POS tags into the equation, our results get much worse. During the text generation process, this program will keep track of words it has at the end of some lines, to use as a template for the rhyme scheme. In the meantime, we rely on the Markov chain brings our generated text up to the desired POS at the end of the next line. The way we implemented our solution was by checking to see if any of the current words (gotten from our corpus) belonging to the POS are in the active rhyme set. If so, we have a new end of line, otherwise, just load another Markov-random word from this POS. In our original implementation, we traversed the rhyme set, looking for a word which both rhymed with the template and fit the given POS we were working with, but this tactic made the program twenty times slower, as there were cases with a huge number of words to tokenize and decipher.
 
 ## Conclusion
+Overall, we felt that we learned a great deal from working on this project. Of course, a lot more improvements can be made regarding the results of our project. We do plan on continuing this project once the semester is over, as we have a clear direction on how we can improve this if we had more time. For instance, a simple way to produce more meaningful results would be to add more content with the training corpus. Another way would be to write additional features that can intelligently and adequately handle punctuation. Punctuation can be a nuisance because NLTK parses it and interprets it as a POS. This can be good or bad, depending on the context and so it would take quite a bit of time to research and figure out a clever solution to this. As it stands now, the most common punctuation is the comma and we realized that it slightly improved results if we simply took it out. Lastly, our implementation for designing the prior probabilities table could definitely be optimized. For now, we just have the barebones working as a means to get our foot in the door, but I think by the end of the summer, we could have a much more 
+
+```python
+addendum = " "
+    current_combo = pos_1 + delimiter + pos_2
+
+    if current_combo in PARTS_OF_SPEECH:
+        this_pos = PARTS_OF_SPEECH[current_combo]
+    else:
+        this_pos = PARTS_OF_SPEECH[pos_1]
+
+    random_word = this_pos.get_random_word()
+
+    try:
+        syllable_count += nsyl(random_word)[0]
+    except KeyError:
+        syllable_count += 1
+
+    pos_1 = this_pos.get_random_pos()
+    current_combo = pos_2 + pos_1
+
+    if current_combo in PARTS_OF_SPEECH:
+        pos_2 = PARTS_OF_SPEECH[current_combo].get_random_pos()
+    else:
+        pos_2 = PARTS_OF_SPEECH[pos_1].get_random_pos()
+
+    if syllable_count >= AVG_SYL:
+        addendum = "\n"
+        # Try to find a rhyme if possible.
+        if len(to_rhyme) > 0:
+            random_word = this_pos.find_rhyme(to_rhyme, cmu_entries)
+            to_rhyme = ""
+        else:
+            if random_word.find(' ') > -1:
+                to_rhyme = random_word.split(' ')[1]
+            else:
+                to_rhyme = random_word
+        if line_count % 8 == 0:
+            parsed = FIRST_COMBO.split(delimiter)
+            pos_1 = parsed[0]
+            pos_2 = parsed[1]
+            addendum = "\n\n"
+    output += random_word + addendum
+```
 
 ## References
